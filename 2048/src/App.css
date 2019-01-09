@@ -1,0 +1,14 @@
+
+.game-container{
+  padding: 25px;
+}
+.game{
+  width: 100%;
+  height:100%;
+}
+.svg-content-responsive {
+  top: 10px;
+  left: 0;
+  display: flex;
+  position: relative;
+}
