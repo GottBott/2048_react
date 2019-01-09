@@ -12,3 +12,11 @@
   display: flex;
   position: relative;
 }
+
+button{
+  margin: 10px;
+}
+
+span{
+  margin: 10px;
+}

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import './App.css';
 
 
@@ -9,6 +9,7 @@ class GameLogic extends Component {
     }
     this.board = null
     this.score = null
+    this.gameOver = null;
 
     this.addRandomTile = this.addRandomTile.bind(this)
     this.isGameOver = this.isGameOver.bind(this)
@@ -20,7 +21,8 @@ class GameLogic extends Component {
     this.swipeRight = this.swipeRight.bind(this)
     this.swipeRow = this.swipeRow.bind(this)
     this._handleKeyDown = this._handleKeyDown.bind(this)
-
+    this.preformMove = this.preformMove.bind(this)
+    this.resetGame=this.resetGame.bind(this)
 
   }
 
@@ -29,12 +31,16 @@ class GameLogic extends Component {
   }
 
   componentDidMount() {
-    let state = this.props.getGameState()
-    this.board = state.board
-    this.score = state.score
+    this.resetGame()
+  }
+
+  resetGame(){
+    this.board = this.props.getGameState().board
+    this.score = this.props.getGameState().score
+    this.gameOver = this.props.getGameState().gameOver
     this.addRandomTile(this.board)
     this.addRandomTile(this.board)
-    this.props.updateGame(this.board, this.score)
+    this.props.updateGame(this.board, this.score, this.gameOver)
   }
 
   componentDidUpdate() {
@@ -61,7 +67,6 @@ class GameLogic extends Component {
         if (this.board[row][col] === 0) options.push([row, col])
       }
     }
-    console.log(this.movesAvaiable())
     return options.length ? false : !this.movesAvaiable()
 
   }
@@ -162,7 +167,9 @@ class GameLogic extends Component {
     return row
   }
 
+  // human players using keyboard
   _handleKeyDown(event) {
+    let initialBoard = JSON.parse(JSON.stringify(this.board))
     if (event.keyCode === 37) {
       this.board = this.swipeLeft(this.board)
     }
@@ -175,17 +182,31 @@ class GameLogic extends Component {
     else if (event.keyCode === 40) {
       this.board = this.swipeDown(this.board)
     }
-    this.props.updateGame(this.board, this.score)
+    this.props.updateGame(this.board, this.score, this.gameOver)
     setTimeout(() => {
-      this.addRandomTile(this.board)
+      if (!this.compareBoards(initialBoard, this.board)) this.addRandomTile(this.board)
       if (this.isGameOver()) {
-        this.score = 0
-        this.board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        this.gameOver = true
       }
-      this.props.updateGame(this.board, this.score)
+      this.props.updateGame(this.board, this.score, this.gameOver)
     }, 200);
   }
 
+  // method for non human players
+  preformMove(move) {
+    let initialBoard = JSON.parse(JSON.stringify(this.board))
+
+    if (move === 0) this.board = this.swipeLeft(this.board)
+    else if (move === 1) this.board = this.swipeUp(this.board)
+    else if (move === 2) this.board = this.swipeRight(this.board)
+    else if (move === 3) this.board = this.swipeDown(this.board)
+
+    if (!this.compareBoards(initialBoard, this.board)) this.addRandomTile(this.board)
+    if (this.isGameOver()) {
+      this.gameOver = true
+    }
+    this.props.updateGame(this.board, this.score, this.gameOver)
+  }
 
   render() {
     return null
