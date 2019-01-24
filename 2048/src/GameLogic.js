@@ -7,9 +7,12 @@ class GameLogic extends Component {
     super(props)
     this.state = {
     }
-    this.board = null
-    this.score = null
-    this.gameOver = null;
+    this.board = {
+      board: null,
+      score:null,
+      gameOver:null
+    }
+   
 
     this.addRandomTile = this.addRandomTile.bind(this)
     this.isGameOver = this.isGameOver.bind(this)
@@ -22,8 +25,8 @@ class GameLogic extends Component {
     this.swipeRow = this.swipeRow.bind(this)
     this._handleKeyDown = this._handleKeyDown.bind(this)
     this.preformMove = this.preformMove.bind(this)
-    this.resetGame=this.resetGame.bind(this)
-
+    this.resetGame = this.resetGame.bind(this)
+    this.testMove = this.testMove.bind(this)
   }
 
   componentWillMount() {
@@ -34,50 +37,49 @@ class GameLogic extends Component {
     this.resetGame()
   }
 
-  resetGame(){
+  resetGame() {
     this.board = this.props.getGameState().board
-    this.score = this.props.getGameState().score
-    this.gameOver = this.props.getGameState().gameOver
-    this.addRandomTile(this.board)
-    this.addRandomTile(this.board)
-    this.props.updateGame(this.board, this.score, this.gameOver)
+    this.board = this.addRandomTile(this.board)
+    this.board  = this.addRandomTile(this.board )
+    this.props.updateGame(this.board)
   }
 
   componentDidUpdate() {
-
   }
 
-  addRandomTile() {
+  addRandomTile(board) {
     let options = []
-    for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[row].length; col++) {
-        if (this.board[row][col] === 0) options.push([row, col])
+    for (let row = 0; row < board.board.length; row++) {
+      for (let col = 0; col < board.board[row].length; col++) {
+        if (board.board[row][col] === 0) options.push([row, col])
       }
     }
     if (!options.length) return
     let randomLocation = options[Math.floor(Math.random() * options.length)]
-    this.board[randomLocation[0]][randomLocation[1]] = (Math.random() < 0.9) ? 1 : 2
+    board.board[randomLocation[0]][randomLocation[1]] = (Math.random() < 0.9) ? 1 : 2
+
+    return board
 
   }
 
-  isGameOver() {
+  isGameOver(board) {
     let options = []
-    for (let row = 0; row < this.board.length; row++) {
-      for (let col = 0; col < this.board[row].length; col++) {
-        if (this.board[row][col] === 0) options.push([row, col])
+    for (let row = 0; row < board.board.length; row++) {
+      for (let col = 0; col < board.board[row].length; col++) {
+        if (board.board[row][col] === 0) options.push([row, col])
       }
     }
-    return options.length ? false : !this.movesAvaiable()
-
+    board.gameOver = options.length ? false : !this.movesAvaiable(board)
+    return board
   }
 
-  movesAvaiable() {
-    if (!this.compareBoards(this.board, this.swipeUp(this.board))) return true
-    else if (!this.compareBoards(this.board, this.swipeDown(this.board))) return true
+  movesAvaiable(board) {
+    if (!this.compareBoards(board, this.swipeUp(board))) return true
+    else if (!this.compareBoards(board, this.swipeDown(board))) return true
 
-    else if (!this.compareBoards(this.board, this.swipeLeft(this.board))) return true
+    else if (!this.compareBoards(board, this.swipeLeft(board))) return true
 
-    else if (!this.compareBoards(this.board, this.swipeRight(this.board))) return true
+    else if (!this.compareBoards(board, this.swipeRight(board))) return true
 
     return false
   }
@@ -85,7 +87,7 @@ class GameLogic extends Component {
   compareBoards(b1, b2) {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
-        if (b1[i][j] !== b2[i][j]) return false
+        if (b1.board[i][j] !== b2.board[i][j]) return false
       }
     }
     return true
@@ -95,9 +97,10 @@ class GameLogic extends Component {
 
     let newBoard = JSON.parse(JSON.stringify(board))
     for (let i = 0; i < 4; i++) {
-      let newCol = this.swipeRow([newBoard[0][i], newBoard[1][i], newBoard[2][i], newBoard[3][i]])
+      let newCol = this.swipeRow([newBoard.board[0][i], newBoard.board[1][i], newBoard.board[2][i], newBoard.board[3][i]],newBoard.score)
+      newBoard.score = newCol.score
       for (let j = 0; j < 4; j++) {
-        newBoard[j][i] = newCol[j]
+        newBoard.board[j][i] = newCol.row[j]
       }
     }
     return newBoard
@@ -106,9 +109,10 @@ class GameLogic extends Component {
   swipeLeft(board) {
     let newBoard = JSON.parse(JSON.stringify(board))
     for (let i = 0; i < 4; i++) {
-      let newCol = this.swipeRow([newBoard[i][0], newBoard[i][1], newBoard[i][2], newBoard[i][3]])
+      let newCol = this.swipeRow([newBoard.board[i][0], newBoard.board[i][1], newBoard.board[i][2], newBoard.board[i][3]],newBoard.score)
+      newBoard.score = newCol.score
       for (let j = 0; j < 4; j++) {
-        newBoard[i][j] = newCol[j]
+        newBoard.board[i][j] = newCol.row[j]
       }
     }
     return newBoard
@@ -117,9 +121,10 @@ class GameLogic extends Component {
   swipeDown(board) {
     let newBoard = JSON.parse(JSON.stringify(board))
     for (let i = 0; i < 4; i++) {
-      let newCol = this.swipeRow([newBoard[3][i], newBoard[2][i], newBoard[1][i], newBoard[0][i]])
+      let newCol = this.swipeRow([newBoard.board[3][i], newBoard.board[2][i], newBoard.board[1][i], newBoard.board[0][i]],newBoard.score)
+      newBoard.score = newCol.score
       for (let j = 0; j < 4; j++) {
-        newBoard[3 - j][i] = newCol[j]
+        newBoard.board[3 - j][i] = newCol.row[j]
       }
     }
     return newBoard
@@ -128,15 +133,16 @@ class GameLogic extends Component {
   swipeRight(board) {
     let newBoard = JSON.parse(JSON.stringify(board))
     for (let i = 0; i < 4; i++) {
-      let newCol = this.swipeRow([newBoard[i][3], newBoard[i][2], newBoard[i][1], newBoard[i][0]])
+      let newCol = this.swipeRow([newBoard.board[i][3], newBoard.board[i][2], newBoard.board[i][1], newBoard.board[i][0]],newBoard.score)
+      newBoard.score = newCol.score
       for (let j = 0; j < 4; j++) {
-        newBoard[i][3 - j] = newCol[j]
+        newBoard.board[i][3 - j] = newCol.row[j]
       }
     }
     return newBoard
   }
 
-  swipeRow(row) {
+  swipeRow(row,score) {
     // push together
     for (let tile = 1; tile < 4; tile++) {
       if (row[tile] !== 0 && row[tile - 1] === 0) {
@@ -150,7 +156,7 @@ class GameLogic extends Component {
     for (let tile = 1; tile < 4; tile++) {
       if (row[tile] !== 0 && row[tile - 1] === row[tile]) {
         row[tile - 1] = row[tile - 1] + 1
-        this.score = this.score + Math.pow(row[tile - 1], 2)
+        score += Math.pow(2,row[tile - 1])
         row[tile] = 0
       }
     }
@@ -164,7 +170,7 @@ class GameLogic extends Component {
       }
     }
 
-    return row
+    return {row:row,score:score}
   }
 
   // human players using keyboard
@@ -182,17 +188,15 @@ class GameLogic extends Component {
     else if (event.keyCode === 40) {
       this.board = this.swipeDown(this.board)
     }
-    this.props.updateGame(this.board, this.score, this.gameOver)
+    this.props.updateGame(this.board)
     setTimeout(() => {
-      if (!this.compareBoards(initialBoard, this.board)) this.addRandomTile(this.board)
-      if (this.isGameOver()) {
-        this.gameOver = true
-      }
-      this.props.updateGame(this.board, this.score, this.gameOver)
+      if (!this.compareBoards(initialBoard, this.board)) this.board = this.addRandomTile(this.board)
+      this.isGameOver(this.board)
+      this.props.updateGame(this.board)
     }, 200);
   }
 
-  // method for non human players
+  // for non human players
   preformMove(move) {
     let initialBoard = JSON.parse(JSON.stringify(this.board))
 
@@ -201,12 +205,23 @@ class GameLogic extends Component {
     else if (move === 2) this.board = this.swipeRight(this.board)
     else if (move === 3) this.board = this.swipeDown(this.board)
 
-    if (!this.compareBoards(initialBoard, this.board)) this.addRandomTile(this.board)
-    if (this.isGameOver()) {
-      this.gameOver = true
-    }
-    this.props.updateGame(this.board, this.score, this.gameOver)
+    if (!this.compareBoards(initialBoard, this.board)) this.board = this.addRandomTile(this.board)
+    this.isGameOver(this.board)
+    this.props.updateGame(this.board)
   }
+
+  testMove(move, board) {
+    let initialBoard = JSON.parse(JSON.stringify(board))
+    if (move === 0) board = this.swipeLeft(board)
+    else if (move === 1) board = this.swipeUp(board)
+    else if (move === 2) board = this.swipeRight(board)
+    else if (move === 3) board = this.swipeDown(board)
+
+    if (!this.compareBoards(initialBoard, board)) board = this.addRandomTile(board)
+    this.isGameOver(board)
+    return board
+  }
+
 
   render() {
     return null

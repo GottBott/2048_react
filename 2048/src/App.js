@@ -8,9 +8,11 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      board: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
-      score: 0,
-      gameOver: false
+      board: {
+        board: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+        score: 0,
+        gameOver: false
+      }
     }
     this.onGameChange = this.onGameChange.bind(this)
     this.getGameState = this.getGameState.bind(this)
@@ -22,11 +24,9 @@ class App extends Component {
 
   }
 
-  onGameChange(board, score, gameOver) {
+  onGameChange(board) {
     this.setState({
-      board: board,
-      score: score,
-      gameOver: gameOver
+      board: board
     })
   }
 
@@ -35,9 +35,9 @@ class App extends Component {
   }
 
   startAI() {
-    if (!this.state.gameOver) {
+    if (!this.state.board.gameOver) {
       setTimeout(() => {
-        let move = this.AIPlayer.current.executeMove(this.board)
+        let move = this.AIPlayer.current.executeMove(this.state.board)
         this.GameLogic.current.preformMove(move)
         this.startAI()
       }, 50);
@@ -46,16 +46,18 @@ class App extends Component {
 
   resetGame() {
     this.setState({
-      board: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
-      score: 0,
-      gameOver: false
-    },()=>{
+      board: {
+        board: [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+        score: 0,
+        gameOver: false
+      }
+    }, () => {
       this.GameLogic.current.resetGame()
     })
   }
 
   isGameOver() {
-    if (this.state.gameOver) {
+    if (this.state.board.gameOver) {
       return <span>GAME OVER
          <button onClick={this.resetGame}>
           Reset
@@ -72,13 +74,13 @@ class App extends Component {
           <span >
             <button onClick={this.startAI}>Let AI Play!</button>
           </span>
-          <span>Score: {this.state.score}</span>
+          <span>Score: {this.state.board.score}</span>
           <span>{this.isGameOver()}</span>
         </div>
         <div className="game">
           <GameBoard data={this.state.board}></GameBoard>
           <GameLogic ref={this.GameLogic} updateGame={this.onGameChange} getGameState={this.getGameState}></GameLogic>
-          <AIPlayer ref={this.AIPlayer} ></AIPlayer>
+          <AIPlayer ref={this.AIPlayer} gameLogic={this.GameLogic} ></AIPlayer>
         </div>
       </div>
     );

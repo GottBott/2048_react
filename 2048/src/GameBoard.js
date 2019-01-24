@@ -38,7 +38,7 @@ class GameBoard extends Component {
         const padding = 20
         let offsetTop = padding
         let offsetRight = padding
-        for (let row of this.props.data) {
+        for (let row of this.props.data.board) {
             for (let square of row) {
                 if (square > 0) {
                     board.append('rect')
