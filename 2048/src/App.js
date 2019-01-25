@@ -38,9 +38,10 @@ class App extends Component {
     if (!this.state.board.gameOver) {
       setTimeout(() => {
         let move = this.AIPlayer.current.executeMove(this.state.board)
+//        console.log(move,this.state.board)
         this.GameLogic.current.preformMove(move)
         this.startAI()
-      }, 50);
+      }, 100);
     }
   }
 

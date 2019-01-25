@@ -28,32 +28,32 @@ class AIPlayer extends Component {
     let bestMove = -1
     let bestScore = -1
     let iterations = 100
-    let initialBoard = JSON.parse(JSON.stringify(board))
     for (let j = 0; j < 4; j++) {
       for (let i = 0; i < iterations; i++) {
-        board = this.props.gameLogic.current.testMove(j, initialBoard)
-        board = this.evaulateMoveOptions(board, i)
-        moves[j] += board.score
+        let testingBoard = JSON.parse(JSON.stringify(board))
+        testingBoard = this.props.gameLogic.current.testMove(j, testingBoard)
+        //console.log(testingBoard)
+        testingBoard = this.evaulateMoveOptions(testingBoard, i)
+        moves[j] += testingBoard.score
       }
+  
       moves[j] = moves[j] / iterations
       if (moves[j] > bestScore) {
         bestScore = moves[j]
         bestMove = j
       }
     }
+    //console.log(moves)
     //this.fail()
     return bestMove
   }
 
 
   evaulateMoveOptions(board, i) {
-    let count = 0
-    //console.log(board)
     while (!board.gameOver) {
-      count++
       board = this.props.gameLogic.current.testMove(Math.floor(Math.random() * 4), board)
+      //console.log(i,board)
     }
-    //console.log('iteration: ', i, ' moves made ', count, '\n\n')
     return board
   }
 
