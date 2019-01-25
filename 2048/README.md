@@ -1,7 +1,8 @@
 ## 2048 Game Using React + D3
 
-Arrow Keys control board
+Arrow Keys control board for human players, or let the A.I take control. 
 
+Original game Created by Gabriele Cirulli. 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
